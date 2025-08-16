@@ -50,23 +50,6 @@ jobs:
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.DISTRIBUTION_ID }} \
             --paths "/*"
-
-      - name: Send Slack notification
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "text": "🚀 程序员英语词汇宝典已成功部署！",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*程序员英语词汇宝典已成功部署！* 🚀\n网站: <https://learn-english.dev|learn-english.dev>"
-                  }
-                }
-              ]
-            }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
