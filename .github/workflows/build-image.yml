@@ -1,0 +1,36 @@
+name: Build and Push Docker Image
+
+# 当有代码推送到 main 或 master 分支时触发此工作流
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # 给予工作流写入 Packages 的权限
+
+    steps:
+      # 步骤1：检出（下载）您的仓库代码
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 步骤2：登录到 GitHub 容器镜像仓库 (GHCR)
+      # GHCR 是 GitHub 自己的 Docker 镜像仓库服务
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}         # 您的 GitHub 用户名
+          password: ${{ secrets.GITHUB_TOKEN }} # 自动生成的安全令牌，无需手动配置
+
+      # 步骤3：构建 Docker 镜像并推送到 GHCR
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .      # Dockerfile 所在的路径，. 代表根目录
+          push: true      # 构建成功后就推送
+          tags: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest # 给镜像打上 "latest" 标签
